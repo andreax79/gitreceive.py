@@ -1,32 +1,35 @@
-gitreceive
-==========
-[![Build Status](https://travis-ci.org/progrium/gitreceive.png?branch=master)](https://travis-ci.org/progrium/gitreceive)
+gitreceive.py
+=============
+
+This is a Python porting of the bash gitreceive (https://github.com/progrium/gitreceive).
+
+Why? Because I hate shell scripts.
 
 Creates an ssh+git user that accepts on the fly repository pushes and triggers a hook script. 
 
 Push code anywhere. Extend your Git workflow.
 
-gitreceive dynamically creates bare repositories with a special `pre-receive` hook that triggers your own general gitreceive hook giving you easy access to the code that was pushed while still being able to send output back to the git user.
+gitreceive.py dynamically creates bare repositories with a special `pre-receive` hook that triggers your own general gitreceive hook giving you easy access to the code that was pushed while still being able to send output back to the git user.
 
 ## Requirements
 
-You need a Linux server with `git` and `sshd` installed.
+You need a Linux server with `git`, `sshd` and `python >= 2.5` installed.
 
 ## Installing
 
-On your server, download https://raw.github.com/progrium/gitreceive/master/gitreceive to a location on your $PATH and make it executable.
+On your server, download https://raw.github.com/andreax79/gitreceive.py/master/gitreceive.py to a location on your $PATH and make it executable.
 
-## Using gitreceive
+## Using gitreceive.py
 
 #### Set up a git user on the server
 
 This automatically makes a user and home directory if it doesn't exist. 
 
-    $ sudo gitreceive init
+    $ sudo gitreceive.py init
     Created receiver script in /home/git for user 'git'.
 
 You use a different user by setting `GITUSER=somethingelse` in the
-environment before using `gitreceive`.
+environment before using `gitreceive.py`.
 
 #### Modify the receiver script
 
@@ -58,16 +61,16 @@ The repo contents are streamed into `STDIN` as an uncompressed archive (tar file
 
 #### Create a user by uploading a public key from your laptop
 
-We just pipe our local SSH key into the `gitreceive upload-key` command via SSH:
+We just pipe our local SSH key into the `gitreceive.py upload-key` command via SSH:
 
-    $ cat ~/.ssh/id_rsa.pub | ssh you@yourserver.com "sudo gitreceive upload-key <username>"
+    $ cat ~/.ssh/id_rsa.pub | ssh you@yourserver.com "sudo gitreceive.py upload-key [username]"
 
-The `username` argument is just an arbitrary name associated with the key, mostly
-for use in your system for auth, etc.
+The `username` optional argument is just an arbitrary name associated with the key, mostly
+for use in your system for auth, etc. If not provided, the username is extracted from the key.
 
-`gitreceive upload-key` will authorize this key for use on the `$GITUSER`
+`gitreceive.py upload-key` will authorize this key for use on the `$GITUSER`
 account on the server, and use the SSH "forced commands" syntax in the remote
-`.ssh/authorized_keys` file,  causing the internal `gitreceive run` command to
+`.ssh/authorized_keys` file,  causing the internal `gitreceive.py run` command to
 be called when this key is used with the remote git account. This allows us to
 intercept the `git` requests and set up a `pre-receive` hook to run on the
 repo, which triggers the custom receiver script.
@@ -98,28 +101,9 @@ advantage! You can even use chunked-transfer encoding to stream back
 progress in realtime if you wanted to keep using HTTP. Alternatively, you can have the
 receiver script run any other script on the server.
 
-#### Handling submodules
-Submodules are not included when you do a `git push`, if you want them to be part of your workflow, have a look at [Handling Submodules](https://github.com/progrium/gitreceive/wiki/TipsAndTricks#handling-submodules).
-
-## So what?
-
-You can use `gitreceive` not only to trigger code on `git push`, but to provide
-feedback to the user and affect workflow. Use `gitreceive` to:
-
-* Put a `git push` deploy interface in front of App Engine
-* Run your company build/test system as a separate remote
-* Integrate custom systems into your workflow
-* Build your own Heroku
-* Push code anywhere
-
-I used to work at Twilio. Imagine pushing a repo with a TwiML file to a
-gitreceive repo with a phone number for a name. And then it runs that
-TwiML on Twilio and shows you the result, all from the `git push`. 
-
-
 ## Big Thanks
 
-DotCloud, DigitalOcean
+gitreceive
 
 ## License
 
